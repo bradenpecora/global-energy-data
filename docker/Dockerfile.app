@@ -6,7 +6,8 @@ RUN pip3 install Flask==1.1.2 \
                  requests==2.25.1
 
 COPY ./src /app
-COPY ./data /app/data
+COPY ./data/newdata.json /app/data/newdata.json
+
 WORKDIR /app
 
 ENTRYPOINT [ "python3" ]
