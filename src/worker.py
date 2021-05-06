@@ -1,13 +1,10 @@
 from jobs import q, rd, update_job_status, get_job_data, add_image
 from data import get_keys
-import time
-import os
 import matplotlib.pyplot as plt
 import json
 
-worker_ip = os.environ.get('WORKER_IP')
-
 def get_field(field, fields_dict):
+    """Formats each field to be in proper format (all caps) for get_keys()"""
     if field in fields_dict:
         return str(fields_dict[field]).upper()
     else:
@@ -18,7 +15,8 @@ def create_graph(jid):
     update_job_status(jid, 'in progress')
     job_data = get_job_data(jid)
 
-    date_range = json.loads(job_data['date_range']) # is a string. Needs to be ints
+    # Get date range
+    date_range = json.loads(job_data['date_range'])
     year_low = int(date_range[0])
     year_high = int(date_range[1])
     if year_high < year_low:
@@ -27,35 +25,29 @@ def create_graph(jid):
         year_high = temp 
     years = range(year_low, year_high+1)
 
+    # Get keys
     keys = []
-
     countries = json.loads(job_data['countries'])
-
-    for fields_dict in countries:
+    for fields_dict in countries: 
 
         iso = get_field("iso", fields_dict)
         actt = get_field("actt", fields_dict)
         prodt = get_field("prodt", fields_dict)
 
         partial_keys = get_keys(iso,actt,prodt)
-        print(partial_keys)
         for key in partial_keys:
             keys.append(key)
 
-    print(keys)
-
+    # Get data and plot
     for key in keys:
         values = []
         available_years = []
         for year in years:
             value = rd.hget(key,year)
-            print(value)
-            if value != "n/a" and value is not None:
+            if value != "n/a" and value:
                 values.append(float(value))
                 available_years.append(int(year))
             
-        print(str(values))
-        print(str(available_years))
         plt.plot(available_years, values, label = key)
 
     plt.xlabel('Year')

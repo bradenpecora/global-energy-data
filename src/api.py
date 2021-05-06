@@ -14,6 +14,11 @@ def instructions():
     /                      lists possible routes
     /help                  describes data terminology
     /reset                 clears and (re)loads original data to db
+                            - This should be run on initial start up.
+    /clear/all             clears all databases
+    /clear/data            clears database containing energy data
+    /clear/jobs            clears database containing job data
+    /clear/images          clears database containing image file data
 
     The following routes have required query pararemeters. Hitting the route without a query will describe the parameters.
 
@@ -23,15 +28,16 @@ def instructions():
 
     /update                Change or add a new year-value pair to a specific ISO-ACTT-PRODT
 
-    /create                Add a new ISO-ACTT-PROT. Use /update to add values
+    /create                Add a new ISO-ACTT-PROT with empty data.
 
     /delete/all            Deletes all data for specified keys (country name, activity type, product type)
     /delete/date           Deletes all data for specified keys for given year
     /delete/date_range     Deletes all data for specified keys for given year range
 
-    /jobs
-    /jobs/all
-
+    /jobs                  Find data for a specific job
+    /jobs/all              Prints all jobs and data
+    /graph                 Used for instructing worker to create a graph
+    /get_image             Save an image produced by a job
 
 
 """
@@ -74,7 +80,8 @@ def help_me():
 
 @app.route('/reset')
 def reset_data():
-    
+    """ Deletes data from rd and reloads from json file """
+
     for key in rd.keys():
         rd.delete(key)
     
@@ -86,10 +93,41 @@ def reset_data():
 
     return "Data reset \n"
 
-@app.route('/test')
-def test():
-    return json.dumps(rd.hget("YUG-PROD-TOTAL", "1991"))
+@app.route('/clear/data')
+def clear_data():
+    """ Deletes data from rd """
 
+    for key in rd.keys():
+        rd.delete(key)
+
+    return "Data cleared \n"
+
+@app.route('/clear/jobs')
+def clear_jobs():
+    """ Deletes data from jrd """
+
+    for key in jrd.keys():
+        jrd.delete(key)
+
+    return "Jobs cleared \n"
+
+@app.route('/clear/images')
+def clear_image():
+    """ Deletes data from image_rd """
+
+    for key in image_rd.keys():
+        image_rd.delete(key)
+
+    return "Images cleared \n"
+
+@app.rotue('/clear/all')
+def clear_all():
+    """Deletes all data from all datebases""""
+    clear_data()
+    clear_jobs()
+    clear_image()
+
+    return "All databases cleared \n"
 
 @app.route('/get/all', methods=['GET'])
 def get_from_string():
@@ -101,14 +139,17 @@ def get_from_string():
     if iso == 'NONE' and actt == 'NONE' and prodt == 'NONE':
         return """
     This is a route for reading each year's data for an inputted country code (iso), activity (actt), product (prodt),
-    or any combination of those three parameters. Use the form:
+    or any combination of those three parameters. At least one parameter must be specified. If a parameter is not specified,
+    all data that matches the other parameters will be returned.
+     Use the form:
 
-    curl '<host ip>:/<flask port>/get/all?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/get/all?param1=VALUE1&param2=VALUE2&param3=VALUE3'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
+
 """
     else:
         keys = get_keys(iso, actt, prodt)
@@ -129,15 +170,18 @@ def get_from_date():
     if iso == 'NONE' and actt == 'NONE' and prodt == 'NONE' or year == 'None':
         return """
     This is a route for reading each year's data for an inputted country code (iso), activity (actt), product (prodt),
-    or any combination of those three parameters. Use the form:
+    or any combination of those three parameters. At least two parameter must be specified (one must be 'year'). 
+    If a parameter is not specified, all data that matches the other parameters will be returned.
+    Use the form:
 
-    curl '<host ip>:/<flask port>/get/date?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/get/date?param1=VALUE1&param2=VALUE2&param3=VALUE3&year=YEAR'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
-    -'year'  : Value will be the four digit year the user wishes to find data for. This is NECESSARY.
+    -'year'  : Value will be the four digit year the user wishes to find data for. 
+            -This is a required parameter
 
 """
     else:
@@ -161,16 +205,19 @@ def get_from_date_range():
     if iso == 'NONE' and actt == 'NONE' and prodt == 'NONE' or year1 == 'None' or year2 == 'None':
         return """
     This is a route for reading each year's data for an inputted country code (iso), activity (actt), product (prodt),
-    or any combination of those three parameters. Use the form:
+    or any combination of those three parameters. If a parameter is not specified, all data that matches the other parameters will be returned.
+     Use the form:
 
-    curl '<host ip>:/<flask port>/get/date_range?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/get/date_range?param1=VALUE1&param2=VALUE2&param3=VALUE3&year1=YEAR1&year2=YEAR2'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
-    -'year1'  : Value will be the lower bound four digit year the user wishes to find data for. This is NECESSARY.
-    -'year2'  : Value will be the upper bound four digit year the user wishes to find data for. This is NECESSARY.
+    -'year1' : Value will be the lower bound four digit year the user wishes to find data for. 
+                -This is a required parameter.
+    -'year2' : Value will be the upper bound four digit year the user wishes to find data for. 
+                -This is a required parameter.
 
 """
     else:
@@ -205,9 +252,9 @@ def update_value():
 
     if iso == 'NONE' or actt == 'NONE' or prodt == 'NONE' or year == 'None' or value == 'None':
         return """
-    This is a route for updating each a specific year's value for a ISO-ACTT-PRODT.
+    This is a route for updating each a specific year's value for a ISO-ACTT-PRODT. All parameters are required.
 
-    curl '<host ip>:/<flask port>/get/date?iso=ISO&actt=ACTT&prodt=PRODT&year=YEAR&value=VALUE'
+    curl '<host ip>:<flask port>/get/date?iso=ISO&actt=ACTT&prodt=PRODT&year=YEAR&value=VALUE'
 
     Each 'param' can be either:
     -'iso'   : ISO will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
@@ -221,7 +268,7 @@ def update_value():
         key = get_keys(iso, actt, prodt)[0]
         rd.hset(key, int(year), float(value))
 
-        output = key + year + "=" + value + "\n"
+        output = key + ":" + year + "=" + value + "\n"
 
         return output
 
@@ -232,18 +279,18 @@ def create_data():
             in_data = request.get_json(force=True)
         except Exception as e:
             return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
-        rd.hmset(in_data[country], in_data[data])
-        return "The following data has created: \n" + json.dumps({in_data[country]: in_data[data]}) + "\n"
+        rd.hmset(in_data['country'], in_data['data'])
+        return "The following data has created: \n" + json.dumps({in_data['country']: in_data['data']}) + "\n"
 
     else:
         return """
     A new set of data can be created with the following route:
 
-        curl -X POST -H "content-type: application/json" -d '{"country": "ISO-ACTT-PRODT", "data": {"year1": value1, "year2": value2, "yearN": valueN}} <flask IP>:<flask port>/create
+        curl -X POST -H "content-type: application/json" -d '{"country": "ISO-ACTT-PRODT", "data": {"year1": value1, "year2": value2, "yearN": valueN}}' <flask IP>:<flask port>/create
 
     "ISO-ACTT-PRODT" is the format for the country identifer. Technically, this could be anything, 
     but ISO must remain three characters and ACTT must remain four.
-    See /help for more info on these parameters.
+    See /help for more info on/definition of these parameters.
 
 """
 
@@ -259,12 +306,13 @@ def delete_from_string():
     This is a route for deleting each year's data for an inputted country code (iso), activity (actt), product (prodt),
     or any combination of those three parameters. Use the form:
 
-    curl '<host ip>:/<flask port>/delete/all?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/delete/all?param1=VALUE1&param2=VALUE2&param3=VALUE3'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
+
 """
     else:
         keys = get_keys(iso, actt, prodt)
@@ -288,13 +336,14 @@ def delete_from_date():
     This is a route for deleting each year's data for an inputted country code (iso), activity (actt), product (prodt),
     or any combination of those three parameters. Use the form:
 
-    curl '<host ip>:/<flask port>/delete/date?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/delete/date?param1=VALUE1&param2=VALUE2&param3=VALUE3'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
-    -'year'  : Value will be the four digit year the user wishes to delete data for. This is NECESSARY.
+    -'year'  : Value will be the four digit year the user wishes to delete data for. 
+                - This is a required parameter.
 
 """
     else:
@@ -321,14 +370,16 @@ def delete_from_date_range():
     This is a route for reading each year's data for an inputted country code (iso), activity (actt), product (prodt),
     or any combination of those three parameters. Use the form:
 
-    curl '<host ip>:/<flask port>/delete/date_range?param1=VALUE1&param2=VALUE2&param3=VALUE3'
+    curl '<host ip>:<flask port>/delete/date_range?param1=VALUE1&param2=VALUE2&param3=VALUE3'
 
     Each 'param' can be either:
     -'iso'   : Value will be ISO alpha-3 country code (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)
     -'actt'  : Value will be the activity type. (PROD for production, CONS for consumption)
     -'prodt' : Value will be the product type. See /help route for more.
-    -'year1'  : Value will be the lower bound four digit year the user wishes to delete data for. This is NECESSARY.
-    -'year2'  : Value will be the upper bound four digit year the user wishes to delete data for. This is NECESSARY.
+    -'year1'  : Value will be the lower bound four digit year the user wishes to delete data for. 
+                - This is a required parameter.
+    -'year2'  : Value will be the upper bound four digit year the user wishes to delete data for. 
+                - This is a required parameter.
 
 """
     else:
@@ -347,7 +398,7 @@ def delete_from_date_range():
             for year in range(year1, year2 + 1):
                 rd.hdel(key, year)
 
-        output = "The data for " + year1 + " through " + year2 + " was deleted for the following keys: \n" + str(keys)
+        output = "The data for " + str(year1) + " through " + str(year2) + " was deleted for the following keys: \n" + str(keys)
 
         return output
 
@@ -367,7 +418,7 @@ def jobs_api_graph():
         return """
     Data can be plotted with the following route:
 
-        curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "ISO1", "actt": "ACTT, "prodt": "PRODT"}, {<next dict>}], "date_range": [YEAR1, YEAR2]}' <flask IP>:<flask port>/graph
+        curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "ISO1", "actt": "ACTT", "prodt": "PRODT"}, {<next dict>}], "date_range": [YEAR1, YEAR2]}' <flask IP>:<flask port>/graph
 
     Each dictionary in the list corresponding to the "countries" key must have at least one entry (iso, actt, prodt).
     If a parameter is not specified, all ISO-ACTT-PRODT with matching values will be selected. For example, if ISO and PRODT are specified,
@@ -376,6 +427,9 @@ def jobs_api_graph():
 
     The date range is specified by YEAR1 and YEAR2. All years between these years will be plotted, if the datapoint exists. 
 
+    Use /jobs to check stauts of the job posted
+    Use /get_image to download the image after it has been created.
+
 """
 
 @app.route('/jobs', methods=['GET'])
@@ -383,8 +437,7 @@ def get_job():
     jid = str(request.args.get('jid'))
     if jid != 'None':
         jid = 'job.{}'.format(jid)
-        output = {'jid': jrd.hget(jid,'jid'), 'status': jrd.hget(jid,'status'), 'countries' : jrd.hget(jid, 'countries'), 'date_range': jrd.hget(jid, 'date_range'), 'image_status:' : jrd.hget(jid, 'image_status')}
-
+        output = jrd.hgetall(jid)
         return jsonify(output)
     else:
         return """
@@ -396,9 +449,10 @@ def get_job():
 
 @app.route('/jobs/all', methods=['GET'])
 def get_jobs_all():
+    """Prints all jobs"""
     output = {}
     for jid in jrd.keys():
-        output[jid] = {'jid': jrd.hget(jid,'jid'), 'status': jrd.hget(jid,'status'), 'countries' : jrd.hget(jid, 'countries'), 'date_range': jrd.hget(jid, 'date_range')}
+        output[jid] = jrd.hgetall(jid)
     return jsonify(output)
 
 
@@ -414,11 +468,10 @@ def get_image():
         return """
     This route can be used to download an image 
 
-        curl '<flask IP>:<flask port>/jobs?jid=<job id>
+        curl '<flask IP>:<flask port>/get_image?jid=<job id> > <filename>.png
 
+    Notice the `>` used not as a marker for substitution, which is used to output the response (containing the image).
 """
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

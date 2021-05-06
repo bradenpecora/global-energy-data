@@ -6,13 +6,13 @@ import os
 import sys
 
 redis_ip = os.environ.get('REDIS_IP')
-# if not redis_ip:
-#     raise Exception()
+if not redis_ip:
+    raise Exception()
 
-rd = StrictRedis(host=redis_ip, port=6379, db=0, decode_responses=True)
-jrd = StrictRedis(host=redis_ip, port=6379, db=1, decode_responses=True)
-q = HotQueue("queue", host=redis_ip, port=6379, db=2)
-image_rd = StrictRedis(host=redis_ip, port=6379, db=3)
+rd = StrictRedis(host=redis_ip, port=6379, db=0, decode_responses=True) # energy data
+jrd = StrictRedis(host=redis_ip, port=6379, db=1, decode_responses=True) # job data
+q = HotQueue("queue", host=redis_ip, port=6379, db=2) # job queue
+image_rd = StrictRedis(host=redis_ip, port=6379, db=3) # image file data
 
 # Allows print statements to be viewed in logs:
 original_stdout = sys.stdout
@@ -62,5 +62,6 @@ def get_job_data(jid):
     return jrd.hgetall(_generate_job_key(jid))
 
 def add_image(jid, img):
+    """ Adds image status to jrd and image file to image_rd """
     jrd.hset(_generate_job_key(jid), 'image_status', 'created')
     image_rd.hset(jid, 'image', img)
