@@ -120,7 +120,7 @@ def clear_image():
 
     return "Images cleared \n"
 
-@app.rotue('/clear/all')
+@app.route('/clear/all')
 def clear_all():
     """Deletes all data from all datebases"""
     clear_data()

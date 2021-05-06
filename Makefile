@@ -86,5 +86,5 @@ k-prod-del:
 
 push:
 	git push
-	git tag -a ${ver} -m "v ${ver}"
-	git push origin ${ver}
+	git tag -a ${VER} -m "v ${VER}"
+	git push origin ${VER}
