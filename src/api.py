@@ -122,7 +122,7 @@ def clear_image():
 
 @app.rotue('/clear/all')
 def clear_all():
-    """Deletes all data from all datebases""""
+    """Deletes all data from all datebases"""
     clear_data()
     clear_jobs()
     clear_image()

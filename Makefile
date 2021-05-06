@@ -1,7 +1,7 @@
   
 NSPACE="bradenpecora"
 APP="global-energy-data"
-VER="0.1.1"
+VER="0.1.4"
 RPORT="6406"
 FPORT="5026"
 UID="869731"
@@ -64,23 +64,15 @@ test-all: test-db test-api test-wrk
 clean-all: clean-db clean-api clean-wrk
 
 
+k-test-db:
+	kubectl apply -f k8s/test/db/bradenp-ged-test-redis-service.yml
+	kubectl apply -f k8s/test/db
 
+k-test-api:
+	kubectl apply -f k8s/test/api
 
-compose-up:
-	VER=${VER} docker-compose -f docker/docker-compose.yml pull
-	VER=${VER} docker-compose -f docker/docker-compose.yml -p ${NSPACE} up -d --build ${NSPACE}-db
-	VER=${VER} docker-compose -f docker/docker-compose.yml -p ${NSPACE} up -d --build ${NSPACE}-api
-	sleep 5
-	VER=${VER} docker-compose -f docker/docker-compose.yml -p ${NSPACE} up -d --build ${NSPACE}-wrk
-
-compose-down:
-	VER=${VER} docker-compose -f docker/docker-compose.yml -p ${NSPACE} down
-
-
-
-
-k-test:
-	cat kubernetes/test/* | TAG=${VER} envsubst '$${TAG}' | yq | kubectl apply -f -
+k-test-wrk:
+	kubectl apply -f k8s/test/wrk
 
 k-test-del:
 	cat kubernetes/test/*deployment.yml | TAG=${VER} envsubst '$${TAG}' | yq | kubectl delete -f -
@@ -91,3 +83,8 @@ k-prod:
 
 k-prod-del:
 	cat kubernetes/prod/*deployment.yml | TAG=${VER} envsubst '$${TAG}' | yq | kubectl delete -f -
+
+push:
+git push
+git tag -a ${ver} -m "v ${ver}"
+git push origin ${ver}
