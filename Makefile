@@ -1,7 +1,7 @@
   
 NSPACE="bradenpecora"
 APP="global-energy-data"
-VER="0.0.2"
+VER="0.1.0"
 RPORT="6406"
 FPORT="5026"
 UID="869731"
@@ -16,18 +16,12 @@ build-db:
                      -f docker/Dockerfile.db \
                      ./
 
-build-api:
-	docker build -t ${NSPACE}/${APP}-api:${VER} \
+build-app:
+	docker build -t ${NSPACE}/${APP}-app:${VER} \
                      -f docker/Dockerfile.app \
                      ./
 
-build-wrk:
-	docker build -t ${NSPACE}/${APP}-wrk:${VER} \
-                     -f docker/Dockerfile.app \
-                     ./
-
-
-test-db: build-db
+test-db:
 	docker run --name ${NSPACE}-db \
                    --network ${NSPACE}-network-test \
                    -p ${RPORT}:6379 \
@@ -36,21 +30,21 @@ test-db: build-db
                    -v ${PWD}/data/:/data \
                    ${NSPACE}/${APP}-db:${VER}
 
-test-api: build-api
+test-api:
 	docker run --name ${NSPACE}-api \
                    --network ${NSPACE}-network-test \
                    --env REDIS_IP=${NSPACE}-db \
                    -p ${FPORT}:5000 \
                    -d \
-                   ${NSPACE}/${APP}-api:${VER} api.py
+                   ${NSPACE}/${APP}-app:${VER} api.py
 
 
-test-wrk: build-wrk
+test-wrk:
 	docker run --name ${NSPACE}-wrk \
                    --network ${NSPACE}-network-test \
                    --env REDIS_IP=${NSPACE}-db \
                    -d \
-                   ${NSPACE}/${APP}-wrk:${VER} 
+                   ${NSPACE}/${APP}-app:${VER} worker.py
 
 clean-db:
 	docker ps -a | grep ${NSPACE}-db | awk '{print $$1}' | xargs docker rm -f
@@ -63,7 +57,7 @@ clean-wrk:
 
 
 
-build-all: build-db build-api build-wrk
+build-all: build-db build-app
 
 test-all: test-db test-api test-wrk
 

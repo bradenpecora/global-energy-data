@@ -1,6 +1,5 @@
 # TO DO:
 
-- create worker that prints a graph
 - create prod and test env for k8s
     - get image to print from k8s
 - write documentation

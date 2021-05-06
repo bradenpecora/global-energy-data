@@ -1,7 +1,7 @@
 # api.py
 import json
-from flask import Flask, request, jsonify
-from jobs import add_job, rd 
+from flask import Flask, request, jsonify, send_file
+from jobs import add_job, rd, jrd, image_rd
 from data import get_keys
 
 app = Flask(__name__)
@@ -29,6 +29,8 @@ def instructions():
     /delete/date           Deletes all data for specified keys for given year
     /delete/date_range     Deletes all data for specified keys for given year range
 
+    /jobs
+    /jobs/all
 
 
 
@@ -237,7 +239,7 @@ def create_data():
         return """
     A new set of data can be created with the following route:
 
-        curl -X POST -H "content-type: application/json" -d '{"country": "ISO-ACTT-PRODT", "data": {"year1": value1, "year2": value2, "yearN": valueN}}
+        curl -X POST -H "content-type: application/json" -d '{"country": "ISO-ACTT-PRODT", "data": {"year1": value1, "year2": value2, "yearN": valueN}} <flask IP>:<flask port>/create
 
     "ISO-ACTT-PRODT" is the format for the country identifer. Technically, this could be anything, 
     but ISO must remain three characters and ACTT must remain four.
@@ -349,19 +351,74 @@ def delete_from_date_range():
 
         return output
 
-@app.route('/jobs', methods=['GET','POST'])
-def jobs_api():
+@app.route('/graph', methods=['GET','POST'])
+def jobs_api_graph():
     if request.method == 'POST':
         try:
-            job = request.get_json(force=True)
+            job = request.get_json()
         except Exception as e:
-            return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
-        return "The following job has been submitted: \n" + json.dumps(add_job(job['start'], job['end'])) + "\n"
+            return json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
 
+        countries = json.dumps(job['countries'])
+        date_range = json.dumps(job['date_range'])
+
+        return jsonify(add_job(countries, date_range))
     else:
         return """
-    Add information on POSTing a job
+    Data can be plotted with the following route:
+
+        curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "ISO1", "actt": "ACTT, "prodt": "PRODT"}, {<next dict>}], "date_range": [YEAR1, YEAR2]}' <flask IP>:<flask port>/graph
+
+    Each dictionary in the list corresponding to the "countries" key must have at least one entry (iso, actt, prodt).
+    If a parameter is not specified, all ISO-ACTT-PRODT with matching values will be selected. For example, if ISO and PRODT are specified,
+    but ACTT is not, all ACTT types that match the ISO and PRODT will be plotted.
+    Additional sets of countries can be added to the graph with additional dictionaries in the list.
+
+    The date range is specified by YEAR1 and YEAR2. All years between these years will be plotted, if the datapoint exists. 
+
 """
+
+@app.route('/jobs', methods=['GET'])
+def get_job():
+    jid = str(request.args.get('jid'))
+    if jid != 'None':
+        jid = 'job.{}'.format(jid)
+        output = {'jid': jrd.hget(jid,'jid'), 'status': jrd.hget(jid,'status'), 'countries' : jrd.hget(jid, 'countries'), 'date_range': jrd.hget(jid, 'date_range'), 'image_status:' : jrd.hget(jid, 'image_status')}
+
+        return jsonify(output)
+    else:
+        return """
+    This route can be used to find the status of a specific job.
+
+        curl '<flask IP>:<flask port>/jobs?jid=<job id>
+
+"""
+
+@app.route('/jobs/all', methods=['GET'])
+def get_jobs_all():
+    output = {}
+    for jid in jrd.keys():
+        output[jid] = {'jid': jrd.hget(jid,'jid'), 'status': jrd.hget(jid,'status'), 'countries' : jrd.hget(jid, 'countries'), 'date_range': jrd.hget(jid, 'date_range')}
+    return jsonify(output)
+
+
+@app.route('/get_image', methods=['GET'])
+def get_image():
+    jid = str(request.args.get('jid'))
+    if jid != 'None':
+        path = f'{jid}.png'
+        with open(path, 'wb') as f:
+            f.write(image_rd.hget(jid, 'image'))
+        return send_file(path, mimetype='image/png', as_attachment=True)
+    else:
+        return """
+    This route can be used to download an image 
+
+        curl '<flask IP>:<flask port>/jobs?jid=<job id>
+
+"""
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
