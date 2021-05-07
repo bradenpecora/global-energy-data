@@ -229,33 +229,34 @@ https://isp-proxy.tacc.utexas.edu/bradenp/get_image?jid=<job id>
 
 ###
 
- For example, say we want to compare the United States' production of renewable energy to Yugoslavia production and consumption of nuclear energy between 1985 and 1995
+ For example, say we want to compare the United States' and the World's production of Nuclear Energy:
 
  ```bash
- root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "USA", "actt": "PROD", "prodt": "RENEW"}, {"iso": "YUG", "prodt" : "NUCLEAR"}], "date_range": [1985, 1995]}' 10.98.23.226:5000/graph
+root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "USA", "actt": "PROD", "prodt": "NUCLEAR"}, {"iso": "WOR","actt": "PROD", "prodt" : "NUCLEAR"}], "date_range": [1980, 1990]}' 10.104.224.168:5000/graph
 {
-  "countries": "[{\"iso\": \"USA\", \"actt\": \"PROD\", \"prodt\": \"RENEW\"}, {\"iso\": \"YUG\", \"prodt\": \"NUCLEAR\"}]", 
-  "date_range": "[1985, 1995]", 
-  "jid": "03d1dac0-acd2-44b9-8ad2-2ffa98dff915", 
+  "countries": "[{\"iso\": \"USA\", \"actt\": \"PROD\", \"prodt\": \"NUCLEAR\"}, {\"iso\": \"WOR\", \"actt\": \"PROD\", \"prodt\": \"NUCLEAR\"}]", 
+  "date_range": "[1980, 1990]", 
+  "jid": "4f4ce80a-18be-4d7d-a40e-aa9b56f2c0a5", 
   "status": "submitted"
 }
-root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl '10.98.23.226:5000/jobs?jid=03d1dac0-acd2-44b9-8ad2-2ffa98dff915'{
-  "countries": "[{\"iso\": \"USA\", \"actt\": \"PROD\", \"prodt\": \"RENEW\"}, {\"iso\": \"YUG\", \"prodt\": \"NUCLEAR\"}]", 
-  "date_range": "[1985, 1995]", 
+root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl '10.104.224.168:5000/jobs?jid=4f4ce80a-18be-4d7d-a40e-aa9b56f2c0a5'
+{
+  "countries": "[{\"iso\": \"USA\", \"actt\": \"PROD\", \"prodt\": \"NUCLEAR\"}, {\"iso\": \"WOR\", \"actt\": \"PROD\", \"prodt\": \"NUCLEAR\"}]", 
+  "date_range": "[1980, 1990]", 
   "image_status": "created", 
-  "jid": "03d1dac0-acd2-44b9-8ad2-2ffa98dff915", 
+  "jid": "4f4ce80a-18be-4d7d-a40e-aa9b56f2c0a5", 
   "status": "complete"
 }
-root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl '10.98.23.226:5000/get_image?jid=03d1dac0-acd2-44b9-8ad2-2ffa98dff915' > output.png
+root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl '10.104.224.168:5000/get_image?jid=4f4ce80a-18be-4d7d-a40e-aa9b56f2c0a5' > img.png
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-100 24953  100 24953    0     0   316k      0 --:--:-- --:--:-- --:--:--  320k
+100 27267  100 27267    0     0  2420k      0 --:--:-- --:--:-- --:--:-- 2662k
 ```
 ```bash
 [ISP02] $ wget https://isp-proxy.tacc.utexas.edu/bradenp/get_image?jid=03d1dac0-acd2-44b9-8ad2-2ffa98dff915 --no-check-certificate
 ```
 
-Here is the (rather uninteresting) result:
+Here is the result:
 
 ![alt text][ex1]
 
@@ -266,11 +267,11 @@ Here is the (rather uninteresting) result:
 Another example: World production of all product types from 2000 to 2010:
 
 ```bash
-root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/# curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "WOR", "actt": "PROD"}], "date_range": [2000, 2010]}' 10.98.23.226:5000/graph
+root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/# curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "WOR", "actt": "PROD"}], "date_range": [2000, 2010]}' 10.104.224.168:5000/graph
 {
   "countries": "[{\"iso\": \"WOR\", \"actt\": \"PROD\"}]", 
   "date_range": "[2000, 2010]", 
-  "jid": "6ece178c-bd1c-4096-876b-ce4fb567a8ac", 
+  "jid": "7ab8502f-0109-48cf-8e20-277d9ad62fb6", 
   "status": "submitted"
 }
 ```

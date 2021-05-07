@@ -28,6 +28,8 @@ The following is a brief description of each file
 - /docs
     - user.md : a readme for interacting with the system
     - deploy.md : a readme for deploying the system
+    - /img
+        - contains images for docs
 - /k8s
     contains .yml files for creating a k8s system in either a production or testing environment
 - /src
@@ -37,11 +39,3 @@ The following is a brief description of each file
     - worker.py : contains script to generate image from job id
 - Makefile : used for make commands (ease of access)
 ```
-
-# TO DO:
-
-- write documentation
-
-- Extra:
-    - write unit tests
-    - add an extra analysis job

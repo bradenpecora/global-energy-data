@@ -30,7 +30,7 @@ spec:
           - name: FLASK_ENV
             value: "development"
           - name: REDIS_IP
-            value: "10.107.251.44" # Change this to the Cluster IP of the redis service
+            value: "10.96.244.146" # Change this to the Cluster IP of the redis service
           ports:
           - name: http
             containerPort: 5000

@@ -35,7 +35,7 @@ For running or cleaning a specific container, change `all` to either `db`, `api`
 
 ## Kubernetes
 
-Kubernetes pods run from docker images on DockerHub. I already have an [image](https://hub.docker.com/repository/docker/bradenpecora/global-energy-data-app/general) that is used and connected to this repository. The `test` environment uses the latest image, while the `prod` environment uses a specific tag of an image(see Line 25 of any of the flask/worker deployment files to configure). Alternatively, the user can push an image to DockerHub or have DockerHub build an image, and then configure the k8s to pull that image.
+Kubernetes pods run from docker images on DockerHub. I already have an [image](https://hub.docker.com/repository/docker/bradenpecora/global-energy-data-app/general) that is used and connected to this repository. The `test` environment uses the latest image, while the `prod` environment uses a specific tag of an image(see Line 25 of any of the flask/worker deployment files to configure). Alternatively, the user can push an image to DockerHub or have DockerHub build an image, and then configure the k8s cluster to pull that image for the worker and api pods.
 
 There are files for deploying a test environment and production environment of this app. The following instructions will be for the `test` env. To use the `prod` environment, simply replace `test` with `prod` in the following instructions. 
 
