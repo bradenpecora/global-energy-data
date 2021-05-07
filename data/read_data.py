@@ -49,9 +49,9 @@ def get_prod(prod_id):
     elif prod_id == 4415:
         return "PETRO"#"Petroleum and other Liquids"
     elif prod_id == 4419:
-        return "NUCLEAR"
+        return "NRO"#"Nuclear, Renewables and Others"
     elif prod_id == 4417:
-        return "NRO" #"Nuclear, Renewables and Others"
+        return "NUCLEAR" 
     elif prod_id == 4418:
         return "RENEW" #"Renewables and Others"
 
