@@ -48,7 +48,7 @@ def create_graph(jid):
                 values.append(float(value))
                 available_years.append(int(year))
             
-        plt.plot(available_years, values, label = key)
+        plt.plot(available_years, values, '-o', label = key)
 
     plt.xlabel('Year')
     plt.ylabel('Value (quad BTU)')

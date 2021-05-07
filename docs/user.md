@@ -57,7 +57,7 @@ The following routes are for information, or resetting/clearing data from the da
 /clear/images          clears database containing image file data
 ```
 
-IMPORTANT: The `/reset` must be run if `dump.rdb` was not downloaded.
+*IMPORTANT*: The `/reset` must be run to make sure the proper data is in the database.
 
 ```
 root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/# curl '10.98.23.226:5000/reset'
