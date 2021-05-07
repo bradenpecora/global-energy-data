@@ -1,6 +1,6 @@
 # Global Energy Data
 
-This repository contains my final project submission for COE332. See prompt [here](https://coe-332-sp21.readthedocs.io/en/main/homework/final_project.html)
+This repository contains my final project submission for COE332. See prompt [here](https://coe-332-sp21.readthedocs.io/en/main/homework/final_project.html).
 It contains a system of applications that can store, modify, and graph energy data from the [EIA](https://www.eia.gov/international/data/world).
 This data is included.
 

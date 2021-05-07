@@ -267,7 +267,7 @@ Here is the result:
 Another example: World production of all product types from 2000 to 2010:
 
 ```bash
-root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/# curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "WOR", "actt": "PROD"}], "date_range": [2000, 2010]}' 10.104.224.168:5000/graph
+root@bradenp-debug-py-deployment-59b4df4576-lnjpr:/ curl -X POST -H "content-type: application/json" -d '{"countries": [{"iso": "WOR", "actt": "PROD"}], "date_range": [2000, 2010]}' 10.104.224.168:5000/graph
 {
   "countries": "[{\"iso\": \"WOR\", \"actt\": \"PROD\"}]", 
   "date_range": "[2000, 2010]", 
