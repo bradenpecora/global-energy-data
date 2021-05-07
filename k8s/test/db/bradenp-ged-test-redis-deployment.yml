@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bradenp-ged-test-redis-deployment
+  labels:
+    username: bradenp
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      username: bradenp
+      env: test
+  template:
+    metadata:
+      labels:
+        username: bradenp
+        env: test
+        app: bradenp-ged-test-redis
+    spec:
+      containers:
+        - name: redis
+          imagePullPolicy: Always
+          image: redis:5.0.0
+          ports:
+          - name: http
+            containerPort: 6379
+          volumeMounts:
+          - name: bradenp-ged-test-redis-pvc
+            mountPath: "/data"
+      volumes:
+      - name: bradenp-ged-test-redis-pvc
+        persistentVolumeClaim:
+          claimName: bradenp-ged-test-redis-pvc

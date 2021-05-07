@@ -280,7 +280,7 @@ def create_data():
         except Exception as e:
             return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
         rd.hmset(in_data['country'], in_data['data'])
-        return "The following data has created: \n" + json.dumps({in_data['country']: in_data['data']}) + "\n"
+        return "The following data was created: \n" + json.dumps({in_data['country']: in_data['data']}) + "\n"
 
     else:
         return """
@@ -468,7 +468,7 @@ def get_image():
         return """
     This route can be used to download an image 
 
-        curl '<flask IP>:<flask port>/get_image?jid=<job id> > <filename>.png
+        curl '<flask IP>:<flask port>/get_image?jid=<job id>' > <filename>.png
 
     Notice the `>` used not as a marker for substitution, which is used to output the response (containing the image).
 """

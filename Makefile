@@ -11,6 +11,9 @@ list-targets:
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 
+build-network:
+	docker network create ${NSPACE}-network-test
+
 build-db:
 	docker build -t ${NSPACE}/${APP}-db:${VER} \
                      -f docker/Dockerfile.db \
@@ -72,17 +75,21 @@ k-test-api:
 	kubectl apply -f k8s/test/api
 
 k-test-wrk:
-	kubectl apply -f k8s/test/wrk
+	kubectl apply -f k8s/test/worker
 
-k-test-del:
-	cat kubernetes/test/*deployment.yml | TAG=${VER} envsubst '$${TAG}' | yq | kubectl delete -f -
+k-test-all: k-test-db k-test-api k-test-wrk
 
+k-prod-db:
+	kubectl apply -f k8s/prod/db/bradenp-ged-prod-redis-service.yml
+	kubectl apply -f k8s/prod/db
 
-k-prod:
-	cat kubernetes/prod/* | TAG=${VER} envsubst '$${TAG}' | yq | kubectl apply -f -
+k-prod-api:
+	kubectl apply -f k8s/prod/api
 
-k-prod-del:
-	cat kubernetes/prod/*deployment.yml | TAG=${VER} envsubst '$${TAG}' | yq | kubectl delete -f -
+k-prod-wrk:
+	kubectl apply -f k8s/prod/worker
+
+k-prod-all: k-prod-db k-prod-api k-prod-wrk
 
 push:
 	git push

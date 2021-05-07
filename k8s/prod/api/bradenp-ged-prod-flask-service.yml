@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bradenp-ged-prod-flask-service
+  labels:
+    username: bradenp
+    env: prod
+spec:
+  type: ClusterIP
+  selector:
+    username: bradenp
+    env: prod
+    app: bradenp-ged-prod-flask
+  ports:
+  - name: bradenp-ged-prod-flask
+    port: 5000
+    targetPort: 5000

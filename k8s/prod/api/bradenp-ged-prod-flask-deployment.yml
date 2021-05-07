@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bradenp-ged-prod-flask-deployment
+  labels:
+    username: bradenp
+    env: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      username: bradenp
+      env: prod
+  template:
+    metadata:
+      labels:
+        username: bradenp
+        env: prod
+        app: bradenp-ged-prod-flask
+    spec:
+      containers:
+        - name: prod
+          imagePullPolicy: Always
+          image: bradenpecora/global-energy-data-app:1.0.0
+          args: ["api.py"]
+          env:
+          - name: FLASK_APP
+            value: "api.py"
+          - name: FLASK_ENV
+            value: "development"
+          - name: REDIS_IP
+            value: "10.107.251.44" # Change this to the Cluster IP of the redis service
+          ports:
+          - name: http
+            containerPort: 5000
