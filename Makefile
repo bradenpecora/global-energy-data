@@ -1,7 +1,7 @@
   
 NSPACE="bradenpecora"
 APP="global-energy-data"
-VER="1.0.1"
+VER="1.0.2"
 RPORT="6406"
 FPORT="5026"
 UID="869731"

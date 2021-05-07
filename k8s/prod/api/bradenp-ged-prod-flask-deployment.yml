@@ -22,7 +22,7 @@ spec:
       containers:
         - name: prod
           imagePullPolicy: Always
-          image: bradenpecora/global-energy-data-app:1.0.1
+          image: bradenpecora/global-energy-data-app:1.0.2
           args: ["api.py"]
           env:
           - name: FLASK_APP
