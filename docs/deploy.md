@@ -4,7 +4,7 @@ There are currently two options for deploying the system. The user can chose to 
 
 ## Docker
 
-Navigate to `Makefile` and open it in a text editor. Environment variables are included in the first few lines of the file. Change accordingly. The NSPACe, APP and VER will be used in the name of docker images/containers. UID can be found with `id -u` and GID with `id -g`. 
+Navigate to `Makefile` and open it in a text editor. Environment variables are included in the first few lines of the file. Change accordingly. The NSPACE, APP and VER will be used in the name of docker images/containers. UID can be found with `id -u` and GID with `id -g` on the command line. 
 
 A [docker network](https://docs.docker.com/network/network-tutorial-standalone/) is required. Create with the following:
 ```bash
@@ -25,7 +25,7 @@ Run the containers:
 [global-energy-data]$ make test-all
 ```
 
-The containers are now up and running. See `user.md` for how to interact with the routes. To stop the containers:
+The containers are now up and running. Check with `docker ps -a`. See `user.md` for how to interact with the routes. To stop the containers:
 
 ```bash
 [global-energy-data]$ make clean-all

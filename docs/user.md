@@ -25,7 +25,7 @@ This data set contains the amount of energy either produced or consumed in quad 
 
 This system uses three letter uppercase ISO codes for country, which can be found [here](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3). `WOR` refers to the data for the world.
 
- Lowercase `"iso"` refers to that literal string itself, while uppercase `'ISO'` should be substituted for a specific country ISO. A key value pair could look like `{'iso': 'USA'}`, where '`'USA'` is the `'PRODT'` for the United States. Custom `'ISO'`s can be used, but they must remain three uppercase characters.
+ Lowercase `"iso"` refers to that literal string itself, while uppercase `'ISO'` should be substituted for a specific country ISO. A key value pair could look like `{'iso': 'USA'}`, where '`'USA'` is the `'ISO'` for the United States. Custom `'ISO'`s can be used, but they must remain three uppercase characters.
 
 Activity type is abbreviated to `actt`. The above lowercase/uppercase convention applies. `ACTT` is either `PROD` for production or `CONS` for consumption. Additional `ACTT` can be created, but they must remain four uppercase characters.
 
